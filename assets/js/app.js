@@ -20,32 +20,47 @@ $(document).ready(function () {
     $("#add-train-btn").on("click", function (event) {
         //prevent submission of form
         event.preventDefault();
-        // get user input form data
+        // get user input form data 
         var trainName = $("#train-name-input").val().trim();
         var trainDestination = $("#destination-input").val().trim();
         var firstTrainTime = $("#time-input").val().trim();
         var trainFrequency = $("#frequency-input").val().trim();
 
-        var newTrain = {
-            name: trainName,
-            destination: trainDestination,
-            time: firstTrainTime,
-            frequency: trainFrequency
+        // empty input validation
+        if (trainName && trainDestination && firstTrainTime && trainFrequency) {
+            // validation for first Train Time
+            var valid = moment(firstTrainTime, "HH:mm", true).isValid();
+            if (valid) {
+                firstTrainTime = $("#time-input").val().trim();
+                var newTrain = {
+                    name: trainName,
+                    destination: trainDestination,
+                    time: firstTrainTime,
+                    frequency: trainFrequency
+                }
+
+                //console log train data from object
+                // console.log(newTrain.name);
+                // console.log(newTrain.destination);
+                // console.log(newTrain.time);
+                // console.log(newTrain.frequency);
+
+                // Uploads train data to the database
+                database.ref().push(newTrain);
+                // Clears all of the text-boxes
+                $("#train-name-input").val("");
+                $("#destination-input").val("");
+                $("#time-input").val("");
+                $("#frequency-input").val("");
+
+            }
+            else {
+                alert("Please enter valid military time for First Train Time!");
+            }
         }
-
-        // Uploads train data to the database
-        database.ref().push(newTrain);
-
-        // console.log(newTrain.name);
-        // console.log(newTrain.destination);
-        // console.log(newTrain.time);
-        // console.log(newTrain.frequency);
-
-        // Clears all of the text-boxes
-        $("#train-name-input").val("");
-        $("#destination-input").val("");
-        $("#time-input").val("");
-        $("#frequency-input").val("");
+        else {
+            alert("All fields are mandatory");
+        }
 
     });
 
@@ -60,48 +75,29 @@ $(document).ready(function () {
         var firstTime = childSnapshot.val().time;
         var frequency = childSnapshot.val().frequency;
 
-        
-        // var currentTime = moment().format("HH:mm");
-        // console.log(currentTime);
-        // var nextArrival = "0";
-        // var minAway = "0";
-        // if(firstTrainTime==currentTime){
-        //     nextArrival = currentTime+trainFrequency;
-        //             }
-        // for(var startTime = "10:00"; startTime <= currentTime; ){
-        //     break;
-
-        // }
-
-        // var minAway = nextArrival - currentTime
-
-
-         // Assumptions
-    
         // First Time (pushed back 1 year to make sure it comes before current time)
         var firstTimeConverted = moment(firstTime, "hh:mm").subtract(1, "years");
-        //.subtract(1, "years");
         console.log(firstTimeConverted);
-    
+
         // Current Time
         var currentTime = moment();
         console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
-    
+
         // Difference between the times
-        var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+        var diffTime = currentTime.diff(moment(firstTimeConverted), "minutes");
         console.log("DIFFERENCE IN TIME: " + diffTime);
-    
+
         // Time apart (remainder)
         var tRemainder = diffTime % frequency;
         console.log(tRemainder);
-    
+
         // Minute Until Train
         var minAway = frequency - tRemainder;
         console.log("MINUTES TILL TRAIN: " + minAway);
-    
+
         // Next Train
         var nextTrain = moment().add(minAway, "minutes").format("hh:mm A");
-        console.log("ARRIVAL TIME: " +nextTrain);
+        console.log("ARRIVAL TIME: " + nextTrain);
         $("#train-table > tbody").append("<tr><td>" + trainName + "</td><td>" + destination + "</td><td>" +
             frequency + "</td><td>" + nextTrain + "</td><td>" + minAway + "</td><td>");
     });

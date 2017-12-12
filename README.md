@@ -1,6 +1,6 @@
 # Train-Scheduler
-1. This app displays thr scheduled trains to the user from firebase database.
-2. It also allows user to add trains and update the new trains added  in firebase and displays the same to user.
+1. This app displays the scheduled trains to the user from firebase.
+2. It also allows user to add trains,  updates the new trains added in firebase and displays the same to user.
 
 # Frameworks/APIs /Database used:
 1. [Bootstrap]( https://getbootstrap.com/docs/3.3/)
